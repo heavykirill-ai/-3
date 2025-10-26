@@ -170,7 +170,6 @@
             text-align: center;
             position: relative;
             overflow: hidden;
-            margin-top: 60px;
         }
 
         .hero::before {
@@ -830,10 +829,13 @@
                 <button class="admin-btn" onclick="toggleAdminPanel()">
                     <i class="fas fa-times"></i> Скрыть
                 </button>
-                <button class="admin-btn" onclick="showAdminModal('products-modal')">
+                <button class="admin-btn" onclick="showAdminModal('admin-dashboard')">
+                    <i class="fas fa-tachometer-alt"></i> Дашборд
+                </button>
+                <button class="admin-btn" onclick="showAdminModal('products-management')">
                     <i class="fas fa-box"></i> Товары
                 </button>
-                <button class="admin-btn" onclick="showAdminModal('orders-modal')">
+                <button class="admin-btn" onclick="showAdminModal('orders-management')">
                     <i class="fas fa-shopping-cart"></i> Заказы
                 </button>
                 <button class="admin-btn" onclick="showAddProductModal()">
@@ -974,76 +976,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно оформления заказа -->
-    <div class="modal" id="checkout-modal">
-        <div class="modal-content" style="max-width: 600px;">
-            <h3><i class="fas fa-shopping-bag"></i> Оформление заказа</h3>
-            <div class="checkout-steps">
-                <div class="step active" id="step1">1</div>
-                <div class="step" id="step2">2</div>
-                <div class="step" id="step3">3</div>
-            </div>
-            
-            <div id="checkout-step-1">
-                <h4>Данные для доставки</h4>
-                <form id="delivery-form">
-                    <div class="form-group">
-                        <label>ФИО</label>
-                        <input type="text" name="fullName" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Телефон</label>
-                        <input type="tel" name="phone" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Адрес доставки</label>
-                        <textarea name="address" rows="3" required></textarea>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn" onclick="hideModal('checkout-modal')">Отмена</button>
-                        <button type="button" class="btn btn-primary" onclick="nextCheckoutStep()">Продолжить</button>
-                    </div>
-                </form>
-            </div>
-
-            <div id="checkout-step-2" style="display: none;">
-                <h4>Способ оплаты</h4>
-                <div class="form-group">
-                    <label>
-                        <input type="radio" name="payment" value="card" checked> 
-                        <i class="fas fa-credit-card"></i> Банковская карта
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label>
-                        <input type="radio" name="payment" value="cash"> 
-                        <i class="fas fa-money-bill-wave"></i> Наличными при получении
-                    </label>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn" onclick="prevCheckoutStep()">Назад</button>
-                    <button type="button" class="btn btn-success" onclick="processPayment()">Оплатить заказ</button>
-                </div>
-            </div>
-
-            <div id="checkout-step-3" style="display: none;">
-                <div style="text-align: center; padding: 2rem;">
-                    <i class="fas fa-check-circle" style="font-size: 4rem; color: var(--success); margin-bottom: 1rem;"></i>
-                    <h4>Заказ оформлен!</h4>
-                    <p>Номер вашего заказа: <strong id="order-number"></strong></p>
-                    <p>С вами свяжется менеджер для подтверждения заказа.</p>
-                </div>
-                <div class="form-actions">
-                    <button onclick="completeOrder()" class="btn btn-primary">Вернуться к покупкам</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Footer -->
     <footer>
         <div style="max-width: 1200px; margin: 0 auto;">
@@ -1116,3 +1048,116 @@
                         createdAt: new Date().toISOString()
                     }
                 ];
+                localStorage.setItem(DB_KEYS.PRODUCTS, JSON.stringify(initialProducts));
+            }
+
+            if (!localStorage.getItem(DB_KEYS.ORDERS)) {
+                localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify([]));
+            }
+        }
+
+        // Функции для работы с базой данных
+        const db = {
+            getProducts() {
+                return JSON.parse(localStorage.getItem(DB_KEYS.PRODUCTS)) || [];
+            },
+
+            saveProducts(products) {
+                localStorage.setItem(DB_KEYS.PRODUCTS, JSON.stringify(products));
+            },
+
+            getOrders() {
+                return JSON.parse(localStorage.getItem(DB_KEYS.ORDERS)) || [];
+            },
+
+            saveOrders(orders) {
+                localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify(orders));
+            },
+
+            addProduct(product) {
+                const products = this.getProducts();
+                const newProduct = {
+                    ...product,
+                    id: Date.now(),
+                    createdAt: new Date().toISOString()
+                };
+                products.push(newProduct);
+                this.saveProducts(products);
+                return newProduct;
+            },
+
+            deleteProduct(id) {
+                const products = this.getProducts();
+                const filtered = products.filter(p => p.id !== id);
+                this.saveProducts(filtered);
+                return filtered;
+            },
+
+            updateOrderStatus(orderId, status) {
+                const orders = this.getOrders();
+                const order = orders.find(o => o.id === orderId);
+                if (order) {
+                    order.status = status;
+                    this.saveOrders(orders);
+                }
+            }
+        };
+
+        // Основные переменные
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let filteredProducts = db.getProducts();
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            initDatabase();
+            renderProducts();
+            updateCartCounter();
+            setupEventListeners();
+            
+            // Админ панель по умолчанию скрыта
+            // toggleAdminPanel(); // Закомментировано - панель скрыта при загрузке
+        });
+
+        function setupEventListeners() {
+            // Фильтры
+            document.getElementById('apply-filters').addEventListener('click', applyFilters);
+            document.getElementById('reset-filters').addEventListener('click', resetFilters);
+            
+            // Поиск
+            document.getElementById('search-input').addEventListener('input', searchProducts);
+            
+            // Сортировка
+            document.getElementById('sort-select').addEventListener('change', sortProducts);
+            
+            // Корзина
+            document.getElementById('cart-link').addEventListener('click', openCart);
+            document.getElementById('close-cart').addEventListener('click', closeCart);
+            
+            // Мобильное меню
+            document.getElementById('mobile-menu-btn').addEventListener('click', toggleMobileMenu);
+            
+            // Закрытие корзины по клику вне области
+            document.getElementById('cart-modal').addEventListener('click', function(e) {
+                if (e.target === this) closeCart();
+            });
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('nav-menu').classList.toggle('active');
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('product-grid');
+            const noProducts = document.getElementById('no-products');
+            
+            grid.innerHTML = '';
+            
+            if (filteredProducts.length === 0) {
+                noProducts.style.display = 'block';
+                return;
+            }
+            
+            noProducts.style.display = 'none';
+            
+            filteredProducts.forEach(product => {
+                const conditionText = {
