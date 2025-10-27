@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechSecond - Б/у техника с гарантией</title>
+    <title>Next phone - Б/у техника с гарантией</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         /* ПОЛНЫЙ СБРОС СТИЛЕЙ */
@@ -1067,7 +1067,7 @@
     <!-- Основной сайт -->
     <header>
         <div class="nav-container">
-            <a href="#" class="logo" id="mainLogo">TechSecond</a>
+            <a href="#" class="logo" id="mainLogo">Next phone</a>
             
             <!-- ПОИСК В ХЕДЕРЕ - РАБОТАЕТ АВТОМАТИЧЕСКИ -->
             <div class="header-search">
@@ -1087,7 +1087,7 @@
     <!-- Главная страница -->
     <div id="mainPage">
         <section class="hero">
-            <h1>TechSecond - Б/у техника</h1>
+            <h1>Next phone - Б/у техника</h1>
             <p>Качественная техника по доступным ценам</p>
         </section>
 
@@ -1161,12 +1161,12 @@
     </div>
 
     <footer>
-        <p>&copy; 2023 TechSecond. Б/у техника с гарантией.</p>
+        <p>&copy; 2023 Next phone. Б/у техника с гарантией.</p>
     </footer>
 
     <script>
         // БАЗОВЫЕ ДАННЫЕ
-        let products = JSON.parse(localStorage.getItem('techSecondProducts')) || [
+        let products = JSON.parse(localStorage.getItem('Next phoneProducts')) || [
             {
                 id: 1,
                 name: "iPhone 13 Pro",
@@ -1202,9 +1202,9 @@
             }
         ];
 
-        let categories = JSON.parse(localStorage.getItem('techSecondCategories')) || ["Смартфоны", "Ноутбуки", "Планшеты", "Наушники"];
-        let brands = JSON.parse(localStorage.getItem('techSecondBrands')) || ["Apple", "Samsung", "Xiaomi", "Huawei"];
-        let colors = JSON.parse(localStorage.getItem('techSecondColors')) || [
+        let categories = JSON.parse(localStorage.getItem('Next phoneCategories')) || ["Смартфоны", "Ноутбуки", "Планшеты", "Наушники"];
+        let brands = JSON.parse(localStorage.getItem('Next phoneBrands')) || ["Apple", "Samsung", "Xiaomi", "Huawei"];
+        let colors = JSON.parse(localStorage.getItem('Next phoneColors')) || [
             { name: "Черный", value: "#000000" },
             { name: "Белый", value: "#ffffff" },
             { name: "Серебристый", value: "#c0c0c0" },
@@ -1212,16 +1212,16 @@
             { name: "Фиолетовый", value: "#8a2be2" }
         ];
 
-        let cart = JSON.parse(localStorage.getItem('techSecondCart')) || [];
+        let cart = JSON.parse(localStorage.getItem('Next phoneCart')) || [];
         let currentProductId = null;
 
         // ОСНОВНЫЕ ФУНКЦИИ
         function saveData() {
-            localStorage.setItem('techSecondProducts', JSON.stringify(products));
-            localStorage.setItem('techSecondCategories', JSON.stringify(categories));
-            localStorage.setItem('techSecondBrands', JSON.stringify(brands));
-            localStorage.setItem('techSecondColors', JSON.stringify(colors));
-            localStorage.setItem('techSecondCart', JSON.stringify(cart));
+            localStorage.setItem('Next phoneProducts', JSON.stringify(products));
+            localStorage.setItem('Next phoneCategories', JSON.stringify(categories));
+            localStorage.setItem('Next phoneBrands', JSON.stringify(brands));
+            localStorage.setItem('Next phoneColors', JSON.stringify(colors));
+            localStorage.setItem('Next phoneCart', JSON.stringify(cart));
         }
 
         function showNotification(message, type = 'success') {
